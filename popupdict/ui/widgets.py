@@ -35,7 +35,7 @@ class Widgets:
 
         # 词组短语标题
         self.phrases_label = __class__.label(
-            '<span size="large" weight="bold" alpha="95%">网络释义：</span>')  # type: Gtk.Label
+            '<span size="large" weight="bold" alpha="95%">词组短语：</span>')  # type: Gtk.Label
         container.pack_start(self.phrases_label, False, False, 10)
 
         # 词组短语列表

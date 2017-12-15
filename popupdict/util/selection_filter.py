@@ -13,6 +13,10 @@ class SelectionFilter:
         if not text or len(text) == 0 or len(text) > 80:
             return None
 
+        # 主要处理合成词，暂不考虑 word break，（至少 PC 端）较少遇到
+        # https://en.oxforddictionaries.com/punctuation/hyphen
+        text = text.replace('-\n', '-')
+
         match = __class__.FILTER_PATTERN.fullmatch(text)
         if match:
             text = match.group(1)

@@ -69,7 +69,8 @@ class YoudaoZhiyunQueryClient(AbstractQueryClient):
         # http://ai.youdao.com/docs/doc-trans-api.s#p02
         params = {
             'q': text,
-            'from': 'auto',
+            # 设置为 auto 会导致有时识别错误
+            'from': 'EN',
             'to': 'zh-CHS',
             'appKey': self.config.app_id,
             'salt': random.randint(1, 10000),
