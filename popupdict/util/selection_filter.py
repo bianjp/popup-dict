@@ -13,6 +13,10 @@ class SelectionFilter:
         if not text or len(text) == 0 or len(text) > 80:
             return None
 
+        # Remove soft hyphen
+        # https://en.wikipedia.org/wiki/Soft_hyphen
+        text = text.replace('\xad', '')
+
         # 主要处理合成词，暂不考虑 word break，（至少 PC 端）较少遇到
         # https://en.oxforddictionaries.com/punctuation/hyphen
         text = text.replace('-\n', '-')

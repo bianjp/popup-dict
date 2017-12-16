@@ -21,6 +21,7 @@ class QueryAdapter:
 
     def query(self, word: str) -> Optional[QueryResult]:
         try:
-            return self.client.query(word)
+            result = self.client.query(word)
+            return result
         except Exception as e:
             print("Query failed: {}".format(repr(e)))
