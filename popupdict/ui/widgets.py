@@ -67,7 +67,7 @@ class Widgets:
                 label = __class__.auto_wrap_label(item)
                 self.explanations.add(label)
             self.explanations_label.show()
-            self.explanations.show()
+            self.explanations.show_all()
         else:
             self.explanations_label.hide()
             self.explanations.hide()
@@ -83,7 +83,7 @@ class Widgets:
                 label = __class__.auto_wrap_label(markup)
                 self.phrases.add(label)
             self.phrases_label.show()
-            self.phrases.show()
+            self.phrases.show_all()
         else:
             self.phrases_label.hide()
             self.phrases.hide()

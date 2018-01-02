@@ -8,9 +8,14 @@ class SelectionFilter:
     FILTER_PATTERN = re.compile('^[\W\d]*([a-zA-Z\s-]+)[\W\d]*$', re.ASCII)
     WHITESPACE_PATTERN = re.compile('\s+')
 
+    # 选中内容最大长度
+    MAX_LENGTH = 80
+    # 过滤后内容的最小长度
+    MIN_LENGTH = 2
+
     @staticmethod
     def filter(text: str) -> Optional[str]:
-        if not text or len(text) == 0 or len(text) > 80:
+        if not text or len(text) < __class__.MIN_LENGTH or len(text) > __class__.MAX_LENGTH:
             return None
 
         # Remove soft hyphen
@@ -29,7 +34,7 @@ class SelectionFilter:
 
         # 压缩空白字符（包括换行符），替换为一个空格
         text = __class__.WHITESPACE_PATTERN.sub(' ', text)
-        if len(text) == 0:
+        if len(text) < __class__.MIN_LENGTH:
             return None
 
         return text
