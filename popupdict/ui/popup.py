@@ -31,6 +31,11 @@ class Popup(Gtk.Window):
         clipboard = Gtk.Clipboard.get(Gdk.SELECTION_PRIMARY)
         clipboard.connect("owner-change", __class__.selection_changed)
 
+        # 鼠标设备
+        self.pointer_device = Gdk.Display.get_default().get_default_seat().get_pointer()  # type: Gdk.Device
+        # 弹窗显示一段时间后，自动隐藏
+        GLib.timeout_add(300, self.hide_window_if_timeout)
+
     # 渲染翻译结果
     def redraw(self, selection: Selection, query_result: QueryResult):
         # 若选中文本已经变化，不再显示旧的查询结果
@@ -71,6 +76,21 @@ class Popup(Gtk.Window):
         if try_move(target_x + 40, target_y - height / 2):
             return
         self.move(10, 10)
+
+    # 检查鼠标是否在窗口
+    def is_pointer_in_window(self) -> bool:
+        _, pointer_x, pointer_y = self.pointer_device.get_position()
+        x, y = self.get_position()
+        width, height = self.get_size()
+        return x < pointer_x < x + width and y < pointer_y < y + height
+
+    # 弹窗显示一段时间后，自动隐藏
+    def hide_window_if_timeout(self) -> bool:
+        if self.is_visible() and time.time() >= self.time_to_hide:
+            # 若鼠标在窗口中，延迟隐藏窗口
+            if not self.is_pointer_in_window():
+                self.hide()
+        return True
 
     # 选中文本变化事件处理
     @staticmethod

@@ -10,6 +10,10 @@ from popupdict.util import Selection
 
 
 # 监视选中文本，如果变化，发起翻译请求，翻译完成后通知主线程渲染 UI
+# 为何使用单独的线程：
+#   1. 避免主线程繁忙/阻塞，影响响应速度
+#   2. 为避免选中文本过程中频繁触发查询，需要延时查询（即选中内容不再变化时再查询）。使用线程更易处理
+# 有些软件（如 Gnome Terminal）中释放鼠标后才会触发 selection change 事件，而有些软件（如 IntelliJ IDEA）在选中过程中会不停触发
 class QueryDaemon(threading.Thread):
     # 查询延时（选中文本多长时间不再变化时查询）。单位：秒
     QUERY_DELAY = 0.1
@@ -34,9 +38,9 @@ class QueryDaemon(threading.Thread):
 
             # 选中内容不再变化时，发起翻译请求。避免选中文本过程中频繁请求
             selection = Selection.current
-            if selection and not selection.queried and (
-                    selection.time + __class__.QUERY_DELAY <= time.time() <=
-                    selection.time + self.popup.popup_timeout):
+            if selection and not selection.queried and (selection.time + __class__.QUERY_DELAY
+                                                        <= time.time() <=
+                                                        selection.time + self.popup.popup_timeout):
                 # 取消未完成的查询请求
                 # TODO 如果请求已经在执行，Future.cancel 并不能真正取消
                 if query_task:

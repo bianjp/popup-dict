@@ -9,7 +9,7 @@ from .gtk import *
 from .config import Configuration, ConfigError
 from .query import QueryAdapter
 from .ui import Popup
-from .daemon import AutoHidePopupDaemon, QueryDaemon
+from .daemon import QueryDaemon
 
 PID_FILE = os.path.join(GLib.get_user_cache_dir(), 'popup-dict/popup-dict.pid')
 
@@ -54,7 +54,6 @@ def start(config_file: str = None, debug: bool = False):
     window.show_all()
     window.hide()
 
-    AutoHidePopupDaemon(window).start()
     QueryDaemon(window, query_adapter).start()
 
     Gtk.main()
