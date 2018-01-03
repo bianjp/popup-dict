@@ -1,11 +1,11 @@
 import os.path
 import logging
-from configparser import ConfigParser
+from configparser import ConfigParser, SectionProxy
 from typing import Optional, List, Dict
 import pkg_resources
 
 from popupdict.gtk import *
-from .clients import *
+from .client import ConfigError
 from popupdict.util import logger
 
 
@@ -65,13 +65,11 @@ class Configuration:
             raise ConfigError('Missing global configuration: ' + e.args[0])
 
         # 各查询客户端配置
-        try:
-            self.fake = FakeConfiguration()
-            self.youdao_web = YoudaoWebConfiguration(parser['youdao-web'])
-            self.youdao_zhiyun = YoudaoZhiyunConfiguration(parser['youdao-zhiyun'])
-        except KeyError as e:
-            raise ConfigError('Missing configuration section: ' + e.args[0])
+        # 为避免 circular imports, 不能在此处实例化 ClientConfiguration 的子类
+        self.clients = {'default': parser['client']}  # type: Dict[str, SectionProxy]
+        for section_name in parser.sections():
+            if section_name != 'global' and section_name != 'client':
+                self.clients[section_name] = parser[section_name]
 
     def __repr__(self):
-        return 'Configuration(\n  query_method: {},\n  youdao_web: {},\n  youdao_zhiyun: {}\n)'.format(
-            self.query_client, self.youdao_web, self.youdao_zhiyun)
+        return repr(__dict__)

@@ -1,7 +1,7 @@
 import random
 
 from .abstract import AbstractQueryClient
-from popupdict.query.result import QueryResult
+from ..result import QueryResult
 
 
 # 随机返回查询结果。开发/测试时使用，避免频繁调用接口

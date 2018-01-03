@@ -1,11 +1,9 @@
 from .configuration import Configuration
-from .clients import *
+from .client import *
 
 __all__ = [
     'Configuration',
     'ConfigError',
     'ClientConfiguration',
-    'FakeConfiguration',
-    'YoudaoWebConfiguration',
     'YoudaoZhiyunConfiguration',
 ]

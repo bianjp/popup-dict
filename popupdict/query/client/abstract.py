@@ -1,15 +1,16 @@
 import urllib.parse
 from abc import ABC, abstractmethod
-from typing import Optional
+from typing import Optional, Type
 
-from popupdict.query.result import QueryResult
 from popupdict.config import *
+from ..result import QueryResult
 
 
 # Base class for query client
 class AbstractQueryClient(ABC):
     # 客户端 ID，需唯一，用于区分客户端（配置文件、缓存等）
     id = 'abstract'
+    config_class = ClientConfiguration  # type: Type[ClientConfiguration]
 
     def __init__(self, config: ClientConfiguration):
         config.validate()

@@ -5,14 +5,16 @@ import json
 from typing import Optional
 
 from popupdict.config import *
-from popupdict.query.result import QueryResult
 from popupdict.util import logger
 from .abstract import AbstractQueryClient
+from ..result import QueryResult
 
 
 # 有道智云的自然语言翻译服务
 class YoudaoZhiyunQueryClient(AbstractQueryClient):
     id = 'youdao-zhiyun'
+    config_class = YoudaoZhiyunConfiguration
+
     API = 'https://openapi.youdao.com/api'
     DICT_LINK = 'https://dict.youdao.com/w/{}/{}/'
 

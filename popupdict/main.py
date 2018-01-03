@@ -61,10 +61,11 @@ def start(config_file: str = None, cmd_config: Optional[Dict] = None):
 
 def main():
     parser = argparse.ArgumentParser(description='划词翻译')
+    parser.add_argument('--client', metavar='CLIENT_ID', help='查询客户端')
     parser.add_argument('--debug', default=None, action='store_true', help='开启调试模式')
     parser.add_argument('--no-debug', default=None, action='store_false', help='关闭调试模式', dest='debug')
-    parser.add_argument('--config', help='配置文件，默认 ~/.config/popup-dict/config.ini, 或 /etc/popup-dict/config.ini',
-                        metavar='CONFIG_FILE')
+    parser.add_argument('-c', '--config', metavar='CONFIG_FILE',
+                        help='配置文件，默认 ~/.config/popup-dict/config.ini, 或 /etc/popup-dict/config.ini')
     args = parser.parse_args()
 
     if args.config and not os.path.exists(args.config):
@@ -74,11 +75,13 @@ def main():
     # 命令行配置项，用于覆盖配置文件中的配置
     cmd_config = {
         'global': {
+            'query_client': args.client,
+            'debug': args.debug,
         }
     }
+
     # 未指定命令行参数时避免覆盖配置文件
-    if args.debug is not None:
-        cmd_config['global']['debug'] = args.debug
+    cmd_config['global'] = {k: v for k, v in cmd_config['global'].items() if v is not None}
 
     if is_running():
         print('An instance is already running!', file=sys.stderr)
