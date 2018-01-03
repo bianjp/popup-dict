@@ -33,11 +33,13 @@ class FakeConfiguration(ClientConfiguration):
 
 class YoudaoWebConfiguration(ClientConfiguration):
     def __init__(self, section: SectionProxy):
+        # noinspection PyUnresolvedReferences
         super().__init__(section.getint('request_timeout'))
 
 
 class YoudaoZhiyunConfiguration(ClientConfiguration):
     def __init__(self, section: SectionProxy):
+        # noinspection PyUnresolvedReferences
         super().__init__(section.getint('request_timeout'))
         self.app_id = section.get('app_id')  # type: Optional[str]
         self.app_secret = section.get('app_secret')  # type: Optional[str]

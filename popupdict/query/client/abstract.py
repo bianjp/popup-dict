@@ -8,12 +8,15 @@ from popupdict.config import *
 
 # Base class for query client
 class AbstractQueryClient(ABC):
+    # 客户端 ID，需唯一，用于区分客户端（配置文件、缓存等）
+    id = 'abstract'
+
     def __init__(self, config: ClientConfiguration):
         config.validate()
         self.config = config
 
     @abstractmethod
-    def query(self, word: str) -> Optional[QueryResult]:
+    def query(self, text: str) -> Optional[QueryResult]:
         pass
 
     # Escape URL path segment

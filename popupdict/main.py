@@ -3,7 +3,7 @@ import os.path
 import sys
 import psutil
 import argparse
-from typing import Optional
+from typing import Optional, Dict
 
 from .gtk import *
 from .config import Configuration, ConfigError
@@ -11,7 +11,7 @@ from .query import QueryAdapter
 from .ui import Popup
 from .daemon import QueryDaemon
 
-PID_FILE = os.path.join(GLib.get_user_cache_dir(), 'popup-dict/popup-dict.pid')
+PID_FILE = os.path.join(GLib.get_user_cache_dir(), 'popup-dict', 'popup-dict.pid')
 
 
 def read_pid() -> Optional[int]:
@@ -44,8 +44,8 @@ def is_running():
     return False
 
 
-def start(config_file: str = None, debug: bool = False):
-    config = Configuration(config_file)
+def start(config_file: str = None, cmd_config: Optional[Dict] = None):
+    config = Configuration(config_file, cmd_config)
     query_adapter = QueryAdapter(config)
 
     signal.signal(signal.SIGINT, signal.SIG_DFL)
@@ -61,7 +61,8 @@ def start(config_file: str = None, debug: bool = False):
 
 def main():
     parser = argparse.ArgumentParser(description='划词翻译')
-    parser.add_argument('--debug', default=False, action='store_true', help='调试模式')
+    parser.add_argument('--debug', default=None, action='store_true', help='开启调试模式')
+    parser.add_argument('--no-debug', default=None, action='store_false', help='关闭调试模式', dest='debug')
     parser.add_argument('--config', help='配置文件，默认 ~/.config/popup-dict/config.ini, 或 /etc/popup-dict/config.ini',
                         metavar='CONFIG_FILE')
     args = parser.parse_args()
@@ -70,13 +71,22 @@ def main():
         print("Config file {} does not exist!".format(repr(args.config)), file=sys.stderr)
         sys.exit(1)
 
+    # 命令行配置项，用于覆盖配置文件中的配置
+    cmd_config = {
+        'global': {
+        }
+    }
+    # 未指定命令行参数时避免覆盖配置文件
+    if args.debug is not None:
+        cmd_config['global']['debug'] = args.debug
+
     if is_running():
         print('An instance is already running!', file=sys.stderr)
         sys.exit(2)
     else:
         write_pid(os.getpid())
         try:
-            start(config_file=args.config, debug=args.debug)
+            start(args.config, cmd_config)
         except ConfigError as e:
             print(e.args[0], file=sys.stderr)
             sys.exit(1)

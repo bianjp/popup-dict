@@ -6,11 +6,13 @@ from typing import Optional
 
 from popupdict.config import *
 from popupdict.query.result import QueryResult
+from popupdict.util import logger
 from .abstract import AbstractQueryClient
 
 
-# 使用有道智云的自然语言翻译服务进行查词翻译
+# 有道智云的自然语言翻译服务
 class YoudaoZhiyunQueryClient(AbstractQueryClient):
+    id = 'youdao-zhiyun'
     API = 'https://openapi.youdao.com/api'
     DICT_LINK = 'https://dict.youdao.com/w/{}/{}/'
 
@@ -22,23 +24,30 @@ class YoudaoZhiyunQueryClient(AbstractQueryClient):
         try:
             res = requests.get(self.API, params=self._params(text), timeout=self.config.request_timeout)
             if not res.ok:
-                print("Request failed for text={}: status_code={}, reason={}, content={}".format(
-                    repr(text), res.status_code, res.reason, res.text))
-                return None
+                logger.error('[%s] Request failed for query=%s: status_code=%s, reason=%s, content=%s',
+                             self.id, repr(text), res.status_code, res.reason, repr(res.text))
+                return
 
             try:
                 result = res.json()
-            except json.decoder.JSONDecodeError as e:
-                print("Invalid JSON response for text={}: ".format(repr(text), res.text))
+            except json.decoder.JSONDecodeError:
+                logger.error('[%s] Invalid JSON response for query=%s: ', self.id, repr(text), repr(res.text))
                 return
 
             if result['errorCode'] != '0':
-                print("Query failed for word={}: errorCode={}".format(
-                    repr(text), str(result['errorCode'])))
-                return None
+                logger.error('[%s] Query failed for query=%s: errorCode=%s',
+                             self.id, repr(text), str(result['errorCode']))
+                return
+
+            # 没有有效翻译结果
+            if not result['translation'] or (len(result['translation']) == 1 and
+                                             result['translation'][0] == result['query']):
+                logger.debug('[%s] No translation for query=%s: %s', self.id, repr(text), result)
+                return
+
+            logger.debug('[%s] Request success for query=%s: %s', self.id, repr(text), result)
 
             language = result['l'].replace('2zh-CHS', '').lower()
-
             basic = result.get('basic')
             phrases = result.get('web')
             if phrases is not None:
@@ -57,15 +66,15 @@ class YoudaoZhiyunQueryClient(AbstractQueryClient):
                                        phrases=phrases
                                        )
             return query_result
-        except requests.exceptions.RequestException as e:
-            print("Request failed for text={}: {}".format(repr(text), repr(e)))
+        except requests.exceptions.RequestException:
+            logger.exception('[%s] Request failed for query=%s', self.id, repr(text))
 
     @staticmethod
     def dict_link(lang, query):
         return __class__.DICT_LINK.format(lang, __class__.escape_url_path(query))
 
     # 构造请求参数
-    def _params(self, text):
+    def _params(self, text: str):
         # http://ai.youdao.com/docs/doc-trans-api.s#p02
         params = {
             'q': text,

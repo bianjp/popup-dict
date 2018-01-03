@@ -6,6 +6,7 @@ from popupdict.query.result import QueryResult
 
 # 随机返回查询结果。开发/测试时使用，避免频繁调用接口
 class FakeQueryClient(AbstractQueryClient):
+    id = 'fake'
     QUERY_RESULTS = [
         QueryResult('phonetic', '语音',
                     phonetic="fə'nɛtɪk",

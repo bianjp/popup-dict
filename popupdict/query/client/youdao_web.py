@@ -5,8 +5,10 @@ from popupdict.query.result import QueryResult
 from .abstract import AbstractQueryClient
 
 
-# 使用有道词典网页版进行查词翻译
+# 有道词典网页版
 class YoudaoWebQueryClient(AbstractQueryClient):
+    id = 'youdao-web'
+
     def __init__(self, config: YoudaoWebConfiguration):
         super().__init__(config)
         self.config = config

@@ -1,10 +1,12 @@
 import os.path
+import logging
 from configparser import ConfigParser
-from typing import List
+from typing import Optional, List, Dict
 import pkg_resources
 
 from popupdict.gtk import *
 from .clients import *
+from popupdict.util import logger
 
 
 class Configuration:
@@ -16,7 +18,7 @@ class Configuration:
         '/etc/popup-dict/config.ini',
     ]  # type: List[str]
 
-    def __init__(self, config_file: str = None):
+    def __init__(self, config_file: Optional[str] = None, extra_config: Optional[Dict] = None):
         parser = ConfigParser(default_section='client')
         parser.read_string(__class__.DEFAULT_CONFIG)
 
@@ -32,6 +34,9 @@ class Configuration:
                     parser.read(path)
                     break
 
+        if extra_config:
+            parser.read_dict(extra_config)
+
         if not parser.has_section('global'):
             raise ConfigError('Missing configuration section: global')
 
@@ -39,6 +44,10 @@ class Configuration:
         try:
             global_section = parser['global']
             self.query_client = global_section['query_client']
+
+            # 调试模式
+            self.debug = global_section.get('debug') and global_section.getboolean('debug', False) or False
+            logger.setLevel(self.debug and logging.DEBUG or logging.INFO)
 
             # 弹窗显示时间
             self.popup_timeout = global_section.getfloat('popup_timeout')

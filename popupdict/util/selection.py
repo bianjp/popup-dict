@@ -3,6 +3,7 @@ from typing import Optional, Tuple
 
 from popupdict.gtk import Gdk
 from .selection_filter import SelectionFilter
+from .logging import logger
 
 
 # 选中文本状态
@@ -25,12 +26,13 @@ class Selection:
         self.position = (x, y)  # type: Tuple[int, int]
 
         # 显示器，用于获取屏幕大小以决定弹窗位置，保证显示完整
-
         self.monitor = event.window.get_display().get_monitor_at_window(event.window)  # type: Gdk.Monitor
 
     # 每次变化时，创建一个新的对象（避免修改原对象），以避免线程同步问题
     @staticmethod
     def update(text: str, event: Gdk.EventOwnerChange):
+        logger.debug('Selection Changed: %s', repr(text))
         text = SelectionFilter.filter(text)
+        logger.debug('Filtered as: %s', repr(text))
         if text:
             __class__.current = Selection(text, event)
