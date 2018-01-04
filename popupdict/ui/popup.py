@@ -2,7 +2,7 @@ import time
 
 from popupdict.gtk import *
 from popupdict.query import QueryResult
-from popupdict.util import Selection
+from popupdict.util import Selection, logger
 from .widgets import Widgets
 
 
@@ -38,9 +38,15 @@ class Popup(Gtk.Window):
 
     # 渲染翻译结果
     def redraw(self, selection: Selection, query_result: QueryResult):
-        # 若选中文本已经变化，不再显示旧的查询结果
-        if not query_result or selection.text != Selection.current.text:
+        if not query_result:
+            logger.debug('Redraw canceled, since query_result is invalid: %s', repr(query_result))
             return
+        # 若选中文本已经变化，不再显示旧的查询结果
+        if selection.text != Selection.current.text:
+            logger.debug('Redraw canceled, since selection has changed: original=%s, current=%s',
+                         repr(selection.text), repr(Selection.current.text))
+            return
+        logger.debug('Redraw started for query=%s', repr(selection.text))
         self.widgets.draw(query_result)
         minimum_height, natural_height = self.box.get_preferred_height()
         # Avoid warning: Allocating size to window without calling gtk_widget_get_preferred_width/height()
