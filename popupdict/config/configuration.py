@@ -6,7 +6,7 @@ import pkg_resources
 
 from popupdict.gtk import *
 from .client import ConfigError
-from popupdict.util import logger
+from popupdict.util import logger, config_dir
 
 
 class Configuration:
@@ -14,7 +14,7 @@ class Configuration:
     DEFAULT_CONFIG = pkg_resources.resource_string(__package__, 'default.ini').decode()
     # 候选配置文件，按顺序检查，只加载第一个存在的文件
     CANDIDATE_CONFIG_FILES = [
-        os.path.join(GLib.get_user_config_dir(), 'popup-dict/config.ini'),
+        os.path.join(config_dir, 'config.ini'),
         '/etc/popup-dict/config.ini',
     ]  # type: List[str]
 

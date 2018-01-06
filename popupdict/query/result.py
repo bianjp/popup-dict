@@ -3,6 +3,9 @@ from typing import Optional, List, Dict
 
 # 查询结果
 class QueryResult:
+    # 类版本。de-serializing 时需要检查当前版本是否与 serializing 时的版本相同，避免反序列化错误
+    VERSION = 1
+
     def __init__(self, query: str, translation: str,
                  dict_link: Optional[str] = None,
                  phonetic: Optional[str] = None,
