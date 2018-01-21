@@ -84,6 +84,7 @@ class QueryDaemon(threading.Thread):
             # 定期持久化缓存到文件系统
             if time.time() - last_persist_cache_time > 5:
                 self.query_adapter.persist_cache()
+                self.speech_adapter.remove_old_cache()
                 last_persist_cache_time = time.time()
 
             time.sleep(0.05)

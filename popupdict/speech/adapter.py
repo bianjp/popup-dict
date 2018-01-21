@@ -20,6 +20,7 @@ class SpeechAdapter:
             raise ConfigError("Unknown speech client: {}".format(repr(config.speech.client_id)))
 
         self.cache_enabled = config.cache
+        self.max_cache_items = config.max_cache_items
         if self.cache_enabled:
             self.cache_dir = os.path.join(cache_dir, 'speech', self.client.id)  # type: str
             if not os.path.exists(self.cache_dir):
@@ -53,3 +54,17 @@ class SpeechAdapter:
         finally:
             time_spent = (time.time() - start_time) * 1000
             logger.debug('[speech %s] Time spent: %fms', self.client.id, time_spent)
+
+    # 缓存条目数超出数量时，删除旧缓存。使用 LRU 原则
+    def remove_old_cache(self):
+        start_time = time.time()
+        files = os.listdir(self.cache_dir)
+        if len(files) <= self.max_cache_items:
+            return
+        files = [os.path.join(self.cache_dir, f) for f in files]
+        pairs = [(os.path.getatime(f), f) for f in files]
+        pairs.sort()
+        for pair in pairs[1000:]:
+            os.remove(pair[1])
+        time_spent = (time.time() - start_time) * 1000
+        logger.debug('Time spent for clearing old speech cache: %fms', time_spent)
