@@ -28,7 +28,7 @@ class SelectionFilter:
 
         match = __class__.FILTER_PATTERN.fullmatch(text)
         if match:
-            text = match.group(1)
+            text = match.group(1).strip()
         else:
             return None
 
