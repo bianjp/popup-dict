@@ -1,5 +1,6 @@
 from popupdict.gtk import *
 from popupdict.query import QueryResult
+from typing import Callable
 
 
 # UI 元素
@@ -11,14 +12,18 @@ class Widgets:
     PHRASE_ITEM_TEMPLATE = '<a href="{}"><span underline="none" color="#2980B9">{}</span></a>: <span>{}</span>'
     PHRASE_ITEM_TEMPLATE_WITHOUT_LINK = '<span>{}</span>: <span>{}</span>'
 
-    def __init__(self, container: Gtk.Box):
+    def __init__(self, container: Gtk.Box, pronounce_func: Callable):
         # 查询内容
         self.query = __class__.single_line_label()  # type: Gtk.Label
         container.pack_start(self.query, False, False, 0)
 
         # 音标
-        self.phonetic = __class__.auto_wrap_label()  # type: Gtk.Label
-        container.pack_start(self.phonetic, False, False, 0)
+        # label 无法接收鼠标事件，因此使用 EventBox
+        self.phonetic_event_box = Gtk.EventBox()
+        self.phonetic = __class__.auto_wrap_label()
+        self.phonetic_event_box.add(self.phonetic)
+        self.phonetic_event_box.connect('button-press-event', lambda widget, event: pronounce_func())
+        container.pack_start(self.phonetic_event_box, False, False, 0)
 
         # 简略释义
         self.translation = __class__.auto_wrap_label()  # type: Gtk.Label

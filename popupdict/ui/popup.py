@@ -23,7 +23,7 @@ class Popup(Gtk.Window):
 
         # Initialize container, widgets
         self.box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, halign=Gtk.Align.START)
-        self.widgets = Widgets(self.box)
+        self.widgets = Widgets(self.box, self.pronounce)
         self.add(self.box)
 
         # Time to hide to window. Timestamp with float point got by time.time()
@@ -33,7 +33,7 @@ class Popup(Gtk.Window):
         clipboard.connect("owner-change", __class__.selection_changed)
 
         self.current_query_result = None  # type: Optional[QueryResult]
-        self.player = Gst.ElementFactory.make('playbin', 'player')
+        self.player = Gst.ElementFactory.make('playbin', 'player')  # type: Gst.Element
         if not self.player:
             raise Exception('Unable to create audio player')
 
@@ -64,20 +64,26 @@ class Popup(Gtk.Window):
         self.show()
         self.time_to_hide = time.time() + self.popup_timeout
         if query_result.speech_path:
-            self.play_voice(query_result.speech_path)
+            self.pronounce(query_result.speech_path)
 
     # 发音下载完成后，决定是否发音
     def on_speech_downloaded(self, query: str, path: str):
+        logger.debug('on_speech_downloaded: query=%s, path=%s', repr(query), repr(path))
         # 若窗口未显示，或查询内容已改变，不发音
         if not self.is_visible() or not self.current_query_result or self.current_query_result.query != query:
             return
         # 避免重复发音
         if not self.current_query_result.speech_path:
-            self.play_voice(path)
+            self.pronounce(path)
             self.current_query_result.speech_path = path
 
     # 发音
-    def play_voice(self, path: str):
+    def pronounce(self, path: Optional[str] = None):
+        path = path or (self.current_query_result and self.current_query_result.speech_path)
+        if not path:
+            logger.error("Cannot pronounce: path=%s, current_query_result.speech_path=%s",
+                         repr(path), repr(self.current_query_result and self.current_query_result.speech_path))
+            return
         self.player.set_state(Gst.State.READY)
         self.player.set_property('uri', Gst.filename_to_uri(path))
         self.player.set_state(Gst.State.PLAYING)
