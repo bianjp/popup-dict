@@ -41,24 +41,28 @@ class YoudaoZhiyunQueryClient(AbstractQueryClient):
                              self.id, repr(text), str(result['errorCode']))
                 return
 
-            # 没有有效翻译结果
-            if not result['translation'] or (len(result['translation']) == 1 and
-                                             result['translation'][0] == result['query']):
-                logger.debug('[%s] No translation for query=%s: %s', self.id, repr(text), result)
-                return
-
             logger.debug('[%s] Request success for query=%s: %s', self.id, repr(text), result)
 
             language = result['l'].replace('2zh-CHS', '').lower()
+            translation = result['translation'] != [result['query']] and '; '.join(result['translation']) or None
             basic = result.get('basic')
-            phrases = result.get('web')
+            phrases = result.get('web') or None
+
+            # 检查有无有效翻译结果。translation 和 explanations 至少要有其一
+            # 特例：
+            #   * 无 translation, 有 explanations: alt, github
+            #   * 有 translation, 无 explanations: 除英语外的其它语种
+            if not translation and (not basic or not basic.get('explains')):
+                logger.debug('[%s] No translation for query=%s', self.id, repr(text))
+                return
+
             if phrases is not None:
                 for phrase in phrases:
                     phrase['value'] = '; '.join(phrase['value'])
                     phrase['dict_link'] = __class__.dict_link(language, phrase['key'])
 
             # 小语种查询结果没有 'query'
-            query_result = QueryResult(result.get('query', text), '; '.join(result['translation']),
+            query_result = QueryResult(result.get('query', text), translation,
                                        dict_link=__class__.dict_link(language, result.get('query', text)),
                                        phonetic=basic and (
                                            basic.get('us-phonetic') or

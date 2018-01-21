@@ -6,7 +6,8 @@ class QueryResult:
     # 类版本。de-serializing 时需要检查当前版本是否与 serializing 时的版本相同，避免反序列化错误
     VERSION = 1
 
-    def __init__(self, query: str, translation: str,
+    def __init__(self, query: str,
+                 translation: Optional[str] = None,
                  dict_link: Optional[str] = None,
                  phonetic: Optional[str] = None,
                  explanations: Optional[List[str]] = None,
@@ -16,7 +17,7 @@ class QueryResult:
         # 在线词典链接
         self.dict_link = dict_link  # type: Optional[str]
         # 简略释义（一句话解释）
-        self.translation = translation  # type: str
+        self.translation = translation  # type: Optional[str]
         # 音标
         self.phonetic = phonetic  # type: Optional[str]
         # 基本释义

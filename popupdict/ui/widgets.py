@@ -32,16 +32,16 @@ class Widgets:
         # 基本翻译标题
         self.explanations_label = __class__.label(
             '<span size="large" weight="bold" alpha="95%">基本释义：</span>')  # type: Gtk.Label
-        container.add(self.explanations_label)
+        container.pack_start(self.explanations_label, False, False, 5)
 
         # 基本翻译列表
         self.explanations = __class__.list_container()
-        container.pack_start(self.explanations, False, False, 10)
+        container.pack_start(self.explanations, False, False, 5)
 
         # 词组短语标题
         self.phrases_label = __class__.label(
             '<span size="large" weight="bold" alpha="95%">词组短语：</span>')  # type: Gtk.Label
-        container.pack_start(self.phrases_label, False, False, 10)
+        container.pack_start(self.phrases_label, False, False, 5)
 
         # 词组短语列表
         self.phrases = __class__.list_container()
@@ -55,7 +55,11 @@ class Widgets:
             self.query.set_markup(__class__.QUERY_TEMPLATE_WITHOUT_LINK.format(query_result.query))
 
         # 基本释义
-        self.translation.set_text(query_result.translation)
+        if query_result.translation:
+            self.translation.set_text(query_result.translation)
+            self.translation.show()
+        else:
+            self.translation.hide()
 
         # 音标
         if query_result.phonetic:
