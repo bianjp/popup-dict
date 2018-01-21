@@ -1,9 +1,13 @@
+from .exception import ConfigError
 from .configuration import Configuration
-from .client import *
+from .query import *
+from .speech import *
 
 __all__ = [
-    'Configuration',
     'ConfigError',
-    'ClientConfiguration',
+    'Configuration',
+    'QueryClientConfiguration',
     'YoudaoZhiyunConfiguration',
+    'SpeechConfiguration',
+    'SpeechClientConfiguration',
 ]

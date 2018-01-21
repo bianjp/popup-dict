@@ -1,4 +1,5 @@
 import time
+from typing import Optional
 
 from popupdict.gtk import *
 from popupdict.query import QueryResult
@@ -31,6 +32,11 @@ class Popup(Gtk.Window):
         clipboard = Gtk.Clipboard.get(Gdk.SELECTION_PRIMARY)
         clipboard.connect("owner-change", __class__.selection_changed)
 
+        self.current_query_result = None  # type: Optional[QueryResult]
+        self.player = Gst.ElementFactory.make('playbin', 'player')
+        if not self.player:
+            raise Exception('Unable to create audio player')
+
         # 鼠标设备
         self.pointer_device = Gdk.Display.get_default().get_default_seat().get_pointer()  # type: Gdk.Device
         # 弹窗显示一段时间后，自动隐藏
@@ -47,6 +53,7 @@ class Popup(Gtk.Window):
                          repr(selection.text), repr(Selection.current.text))
             return
         logger.debug('Redraw started for query=%s', repr(selection.text))
+        self.current_query_result = query_result
         self.widgets.draw(query_result)
         minimum_height, natural_height = self.box.get_preferred_height()
         # Avoid warning: Allocating size to window without calling gtk_widget_get_preferred_width/height()
@@ -56,6 +63,24 @@ class Popup(Gtk.Window):
         self.move_window(selection)
         self.show()
         self.time_to_hide = time.time() + self.popup_timeout
+        if query_result.speech_path:
+            self.play_voice(query_result.speech_path)
+
+    # 发音下载完成后，决定是否发音
+    def on_speech_downloaded(self, query: str, path: str):
+        # 若窗口未显示，或查询内容已改变，不发音
+        if not self.is_visible() or not self.current_query_result or self.current_query_result.query != query:
+            return
+        # 避免重复发音
+        if not self.current_query_result.speech_path:
+            self.play_voice(path)
+            self.current_query_result.speech_path = path
+
+    # 发音
+    def play_voice(self, path: str):
+        self.player.set_state(Gst.State.READY)
+        self.player.set_property('uri', Gst.filename_to_uri(path))
+        self.player.set_state(Gst.State.PLAYING)
 
     # 根据选中文本位置、弹窗大小、屏幕大小确定弹窗位置，保证弹窗显示完整
     def move_window(self, selection: Selection):

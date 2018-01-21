@@ -8,6 +8,7 @@ from typing import Optional, Dict
 from .gtk import *
 from .config import Configuration, ConfigError
 from .query import QueryAdapter
+from .speech import SpeechAdapter
 from .ui import Popup
 from .daemon import QueryDaemon
 
@@ -47,6 +48,7 @@ def is_running():
 def start(config_file: str = None, cmd_config: Optional[Dict] = None):
     config = Configuration(config_file, cmd_config)
     query_adapter = QueryAdapter(config)
+    speech_adapter = config.speech.enabled and SpeechAdapter(config) or None
 
     signal.signal(signal.SIGINT, signal.SIG_DFL)
 
@@ -54,7 +56,7 @@ def start(config_file: str = None, cmd_config: Optional[Dict] = None):
     window.show_all()
     window.hide()
 
-    QueryDaemon(window, query_adapter).start()
+    QueryDaemon(window, query_adapter, speech_adapter).start()
 
     Gtk.main()
 
@@ -75,13 +77,16 @@ def main():
     # 命令行配置项，用于覆盖配置文件中的配置
     cmd_config = {
         'global': {
-            'query_client': args.client,
             'debug': args.debug,
-        }
+        },
+        'query': {
+            'client': args.client,
+        },
     }
 
     # 未指定命令行参数时避免覆盖配置文件
     cmd_config['global'] = {k: v for k, v in cmd_config['global'].items() if v is not None}
+    cmd_config['query'] = {k: v for k, v in cmd_config['query'].items() if v is not None}
 
     if is_running():
         print('An instance is already running!', file=sys.stderr)

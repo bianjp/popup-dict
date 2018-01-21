@@ -1,10 +1,10 @@
 from typing import Optional
 from configparser import SectionProxy
 
-from .base import ConfigError, ClientConfiguration
+from .base import ConfigError, QueryClientConfiguration
 
 
-class YoudaoZhiyunConfiguration(ClientConfiguration):
+class YoudaoZhiyunConfiguration(QueryClientConfiguration):
     def __init__(self, section: SectionProxy):
         super().__init__(section)
         self.app_id = section.get('app_id')  # type: Optional[str]

@@ -10,9 +10,10 @@ from ..result import QueryResult
 class AbstractQueryClient(ABC):
     # 客户端 ID，需唯一，用于区分客户端（配置文件、缓存等）
     id = 'abstract'
-    config_class = ClientConfiguration  # type: Type[ClientConfiguration]
+    # 配置类
+    config_class = QueryClientConfiguration  # type: Type[QueryClientConfiguration]
 
-    def __init__(self, config: ClientConfiguration):
+    def __init__(self, config: QueryClientConfiguration):
         config.validate()
         self.config = config
 

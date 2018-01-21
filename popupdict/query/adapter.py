@@ -1,4 +1,6 @@
 from typing import Optional
+import time
+import os.path
 
 from popupdict.config import *
 from popupdict.util import logger
@@ -11,24 +13,30 @@ from .cache import QueryCache
 class QueryAdapter:
     def __init__(self, config: Configuration):
         self.cache = QueryCache()
-        for client in valid_clients:
-            if client.id == config.query_client:
-                client_config = client.config_class(config.clients.get(client.id, config.clients['default']))
-                self.client = client(client_config)
+        for client_class in valid_clients:
+            if client_class.id == config.query.client_id:
+                config_section = config.clients.get(client_class.id, config.clients['default'])
+                client_config = client_class.config_class(config_section)
+                self.client = client_class(client_config)
                 break
 
         if not self.client:
-            raise Exception("Unknown query client: {}".format(repr(config.query_client)))
+            raise ConfigError("Unknown query client: {}".format(repr(config.query.client_id)))
 
     def query(self, text: str) -> Optional[QueryResult]:
+        start_time = time.time()
         logger.debug('[%s] Query started for query=%s', self.client.id, repr(text))
 
-        result = self.cache.get(self.client.id, text)
-        if result:
-            logger.debug('[%s] Cache hit for query=%s, result=%s', self.client.id, repr(text), repr(result))
-            return result
-
+        # noinspection PyBroadException
         try:
+            result = self.cache.get(self.client.id, text)
+            if result:
+                # TODO 完善路径的协议检查
+                if result.speech_path and result.speech_path.startswith('/') and not os.path.exists(result.speech_path):
+                    result.speech_path = None
+                logger.debug('[%s] Cache hit for query=%s, result=%s', self.client.id, repr(text), repr(result))
+                return result
+
             result = self.client.query(text)
             logger.debug('[%s] Query finished for query=%s, result=%s', self.client.id, repr(text), repr(result))
             if result:
@@ -36,3 +44,6 @@ class QueryAdapter:
             return result
         except Exception:
             logger.exception('[%s] Query failed for query=%s', self.client.id, repr(text))
+        finally:
+            time_spent = (time.time() - start_time) * 1000
+            logger.debug('[%s] Time spent: %fms', self.client.id, time_spent)
