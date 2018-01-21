@@ -47,3 +47,6 @@ class QueryAdapter:
         finally:
             time_spent = (time.time() - start_time) * 1000
             logger.debug('[%s] Time spent: %fms', self.client.id, time_spent)
+
+    def persist_cache(self):
+        self.cache.persist_if_necessary()

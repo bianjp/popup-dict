@@ -29,6 +29,7 @@ class QueryDaemon(threading.Thread):
         self.executor = ThreadPoolExecutor(20)
 
     def run(self):
+        last_persist_cache_time = time.time()
         last_selection = None  # type: Optional[Selection]
         # 查询翻译任务
         query_task = None  # type: Optional[Future]
@@ -79,5 +80,10 @@ class QueryDaemon(threading.Thread):
                     speech_task = self.executor.submit(self.speech_adapter.get, selection.text)
 
                 selection.queried = True
+
+            # 定期持久化缓存到文件系统
+            if time.time() - last_persist_cache_time > 5:
+                self.query_adapter.persist_cache()
+                last_persist_cache_time = time.time()
 
             time.sleep(0.05)
