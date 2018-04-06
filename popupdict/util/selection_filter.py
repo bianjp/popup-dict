@@ -5,7 +5,7 @@ from typing import Optional
 # 过滤选中文本（删除两端的非字符内容、数字）
 # 暂时只支持英文
 class SelectionFilter:
-    FILTER_PATTERN = re.compile('^[\W\d]*([a-zA-Z\s-]+)[\W\d]*$', re.ASCII)
+    FILTER_PATTERN = re.compile("^[\W\d]*([a-zA-Z\s'-]+)[\W\d]*$", re.ASCII)
     WHITESPACE_PATTERN = re.compile('\s+')
 
     # 选中内容最大长度
