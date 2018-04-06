@@ -8,7 +8,7 @@ Linux 下的划词翻译工具，支持使用有道等多种翻译服务。
 
 功能特点：
 
-* 目前只支持英文->中文翻译
+* 目前只支持英文->中文翻译，支持单词和短语
 * 主要针对 Gnome 桌面环境，不保证其它环境下的正常使用
 * 鼠标划词翻译，弹窗显示
 * 智能处理选中内容（去除两端非英文字符、压缩空白字符、删除换行符等）
@@ -21,6 +21,7 @@ Linux 下的划词翻译工具，支持使用有道等多种翻译服务。
 
 * Python 3.5+
 * Gtk+ 3
+* GStreamer
 * [PyGObject](https://pygobject.readthedocs.io/en/stable/)
 * Python packages:
     * [psutil](https://github.com/giampaolo/psutil)
@@ -60,38 +61,60 @@ popup-dict -h
 
 ```ini
 [global]
-# 查询客户端
-query_client = youdao-zhiyun
 # 弹窗显示时间。单位：秒；类型：float
 popup_timeout = 3
 # 是否使用 Gtk Global Dark Theme。不设置或设为空则使用系统默认设置。类型: boolean
-prefer_dark_theme=
+prefer_dark_theme =
 # 调试模式
 debug = false
+# 缓存翻译结果和音频文件
+cache = true
+# 最大缓存条目数，仅针对单个查询客户端或发音下载器
+max_cache_items = 1000
 
-# 适用于所有客户端的默认设置，可在各客户端的配置中覆盖
-[client]
+# 查询客户端配置
+[query]
+# 查询客户端 id
+client = youdao-zhiyun
+
+# 发音配置
+[speech]
+# 启用发音
+enabled = true
+# 自动播放
+auto_play = true
+# 发音客户端 id
+client = youdao
+
+# 各查询客户端的默认配置，可在各客户端的配置中覆盖
+[query-client]
 # 请求超时时间。单位：秒；类型：float
 request_timeout = 3
 
+# 各发音下载器的默认配置
+[speech-client]
+request_timeout = 5
 
-##### 各客户端配置 ######
+
+##### 各查询客户端配置 ######
 
 # 有道词典网页版
-[youdao-web]
+[query:youdao-web]
 
 # 有道智云
 # http://ai.youdao.com/doc.s#guide
-[youdao-zhiyun]
+[query:youdao-zhiyun]
 app_id =
 app_secret =
+
+
+##### 各发音客户端配置 ######
+[speech:youdao]
 ```
 
 ## Todo
 
 * 实现有道词典网页版查询客户端
-* 弹窗显示时自动发音
-* 点击音标发音
 * 根据选中文本位置而非鼠标位置定位弹窗（应对不用鼠标选中文本的情况；避免遮盖选中文本）
 * 支持 Wayland
 * 支持多显示器
@@ -100,6 +123,9 @@ app_secret =
 * 进程退出时删除 pid 文件
 * 打包到 [AUR](https://aur.archlinux.org/)
 * 版本更新提示
+* 实现 status, start, stop, restart 命令
+* 解决偶现的弹窗中列表显示异常
+* 选中内容在连字符（"-"）处换行时，区分是一个单词被断开还是本来就包含连字符的合成词
 
 ## 类似工具
 

@@ -2,7 +2,7 @@
 
 ## 设计目标
 
-* 使用 Gnome 原生 UI 组件（Gtk+ 3）
+* 优先使用 Gnome 原生/自带组件（Gtk+ 3, GStreamer）
 * 系统依赖少（PyPI 包可以例外）
 * 响应快（主线程不能阻塞或过于繁忙）
 * 界面好看
@@ -50,7 +50,7 @@ __发布到 PyPI：__
 rm -rf dist/*
 python setup.py sdist bdist_wheel
 twine upload dist/*
-``` 
+```
 
 ## 增加查询客户端
 
@@ -73,10 +73,16 @@ twine upload dist/*
 
   尚未找到可靠的方式在进程收到 signal 时执行代码
 
+* 动词的单三、进行时、过去式等形式，名字的复数形式，转为原始形式再查询，以获得更好的查询结果
+
 ## 参考资料
 
 * [Python GTK+3 Tutorial](https://python-gtk-3-tutorial.readthedocs.io/en/latest/)
 * [PyGObject API Reference](https://lazka.github.io/pgi-docs/)
+* [GTK+3 Source Code](https://github.com/GNOME/gtk/)
 * [PyGObject - Threading & Concurrency](https://pygobject.readthedocs.io/en/latest/guide/threading.html)
 * [Wayland support in GTK+](https://wiki.gnome.org/Initiatives/Wayland/GTK%2B)
 * [Gnome useful tools](https://wiki.gnome.org/Newcomers/SolveProject#Other_useful_tools)
+* [GStreamer documentation](https://gstreamer.freedesktop.org/documentation/)
+* [playbin design](https://gstreamer.freedesktop.org/documentation/design/playbin.html)
+* [playbin usage](https://gstreamer.freedesktop.org/documentation/tutorials/playback/playbin-usage.html)
