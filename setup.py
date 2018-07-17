@@ -19,7 +19,7 @@ setup(
     zip_safe=True,
 
     platforms='Linux',
-    python_requires='>= 3.5',
+    python_requires='>= 3.6',
     install_requires=[
         'psutil',
         'requests',
@@ -39,8 +39,8 @@ setup(
         'Intended Audience :: End Users/Desktop',
         'Natural Language :: Chinese (Simplified)',
         'Programming Language :: Python :: 3 :: Only',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Topic :: Desktop Environment',
         'Topic :: Education',
     ],

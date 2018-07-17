@@ -19,7 +19,7 @@ Linux 下的划词翻译工具，支持使用有道等多种翻译服务。
 
 ## 依赖
 
-* Python 3.5+
+* Python 3.6+
 * Gtk+ 3
 * GStreamer
 * [PyGObject](https://pygobject.readthedocs.io/en/stable/)
@@ -126,6 +126,7 @@ app_secret =
 * 实现 status, start, stop, restart 命令
 * 解决偶现的弹窗中列表显示异常
 * 选中内容在连字符（"-"）处换行时，区分是一个单词被断开还是本来就包含连字符的合成词
+* 生词本
 
 ## 类似工具
 
