@@ -22,14 +22,14 @@ Linux 下的划词翻译工具，支持使用有道等多种翻译服务。
 * Python 3.6+
 * Gtk+ 3
 * GStreamer
-* [PyGObject](https://pygobject.readthedocs.io/en/stable/)
+* [PyGObject](https://pygobject.readthedocs.io/en/latest/)
 * Python packages:
     * [psutil](https://github.com/giampaolo/psutil)
     * [requests](https://github.com/requests/requests/)
 
 ## 安装
 
-确保已安装 [PyGObject](https://pygobject.readthedocs.io/en/stable/getting_started.html)
+确保已安装 [PyGObject](https://pygobject.readthedocs.io/en/latest/getting_started.html)
 
 __PyPI:__
 
