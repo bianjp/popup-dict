@@ -52,7 +52,7 @@ def start(config_file: str = None, cmd_config: Optional[Dict] = None):
 
     signal.signal(signal.SIGINT, signal.SIG_DFL)
 
-    window = Popup()
+    window = Popup(config.popup_timeout, config.speech.auto_play)
     window.show_all()
     window.hide()
 

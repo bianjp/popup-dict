@@ -11,11 +11,13 @@ from .widgets import Widgets
 class Popup(Gtk.Window):
     WINDOW_WIDTH = 400  # type: int
 
-    def __init__(self, popup_timeout: float = None):
+    def __init__(self, popup_timeout: float = None, auto_play: bool = True):
         super().__init__(type=Gtk.WindowType.POPUP)
 
         # 弹窗显示时间。单位：秒
         self.popup_timeout = popup_timeout or 3  # type: float
+        # 是否自动发音
+        self.auto_play = auto_play
 
         self.set_border_width(10)
         self.set_default_size(__class__.WINDOW_WIDTH, -1)
@@ -63,12 +65,14 @@ class Popup(Gtk.Window):
         self.move_window(selection)
         self.show()
         self.time_to_hide = time.time() + self.popup_timeout
-        if query_result.speech_path:
+        if self.auto_play and query_result.speech_path:
             self.pronounce(query_result.speech_path)
 
     # 发音下载完成后，决定是否发音
     def on_speech_downloaded(self, query: str, path: str):
         logger.debug('on_speech_downloaded: query=%s, path=%s', repr(query), repr(path))
+        if not self.auto_play:
+            return
         # 若窗口未显示，或查询内容已改变，不发音
         if not self.is_visible() or not self.current_query_result or self.current_query_result.query != query:
             return
