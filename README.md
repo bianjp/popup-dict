@@ -57,6 +57,8 @@ popup-dict -h
 
 也可通过命令参数指定配置文件位置。
 
+__注意：有道智云 API 是付费的，请自行注册账号、创建应用并配置 app_id, app_secret。参考[官方文档](http://ai.youdao.com/doc.s#guide)__
+
 默认配置：
 
 ```ini
